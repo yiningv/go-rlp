@@ -1,11 +1,11 @@
 package rlp
 
 import (
+	"encoding/binary"
 	"fmt"
 )
 
 // A string (ie. byte array) is an item
-// StringItem改成RLPItem, String容易让人误解只能是string数据
 type RLPItem struct {
 	value []byte
 }
@@ -24,10 +24,16 @@ func NewRLPItemFromUint(uintVal uint64) *RLPItem {
 	return NewRLPItem(trimLeftZerosFromBytes(valBytes))
 }
 
-func (s *RLPItem) GetBytes() []byte {
-	return s.value
+func (r *RLPItem) GetBytes() []byte {
+	return r.value
 }
 
-func (s *RLPItem) ToString() string {
-	return fmt.Sprintf("%s", s.value)
+func (r *RLPItem) ToString() string {
+	return fmt.Sprintf("%s", r.value)
+}
+
+func (r *RLPItem) ToUint() uint64 {
+	b := make([]byte, 8)
+	copy(b[8-len(r.value):], r.value)
+	return binary.BigEndian.Uint64(b)
 }
