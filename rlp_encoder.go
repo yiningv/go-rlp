@@ -11,7 +11,7 @@ func encodeString(b []byte) []byte {
 		copy(result[1:], b)
 		return result
 	} else {
-		lenBytes := noLeadingZerosBytes(lenToBytes(len(b)))
+		lenBytes := trimLeftZerosFromBytes(uintToBytes(uint64(len(b))))
 		lenBytesLen := len(lenBytes)
 		result := make([]byte, len(b)+lenBytesLen+1)
 		result[0] = 0xB7 + byte(lenBytesLen)
@@ -21,15 +21,15 @@ func encodeString(b []byte) []byte {
 	}
 }
 
-// 转化字符串长度为字节数组
-func lenToBytes(strLen int) []byte {
+// 转换uint为字节数组
+func uintToBytes(strLen uint64) []byte {
 	result := make([]byte, 8)
-	binary.BigEndian.PutUint64(result, uint64(strLen))
+	binary.BigEndian.PutUint64(result, strLen)
 	return result[:]
 }
 
 // 去掉字节数组的前导零
-func noLeadingZerosBytes(b []byte) []byte {
+func trimLeftZerosFromBytes(b []byte) []byte {
 	for i := 0; i < len(b); i++ {
 		if b[i] != 0 {
 			result := make([]byte, len(b)-i)
