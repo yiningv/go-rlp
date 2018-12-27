@@ -15,7 +15,7 @@ func TestToUint(t *testing.T) {
 		{1<<64 - 1, 1<<64 - 1},
 	}
 	for i, test := range tests {
-		rlpItem := NewRLPItemFromUint(test.input)
+		rlpItem := NewRLPStringFromUint(test.input)
 		toUint := rlpItem.ToUint()
 		if toUint != test.wantVal {
 			t.Errorf("test %d: toUint mismatch, got %d want %d\ninput: %d", i, toUint, test.wantVal, test.input)

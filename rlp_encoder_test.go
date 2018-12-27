@@ -5,7 +5,7 @@ import (
 )
 
 func TestEncodeString(t *testing.T) {
-	fromUint := NewRLPItemFromUint(12111111111111111111)
+	fromUint := NewRLPStringFromUint(12111111111111111111)
 	bytes := encodeString(fromUint.value)
 	t.Log(bytes)
 }

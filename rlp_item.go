@@ -5,35 +5,62 @@ import (
 	"fmt"
 )
 
+type RLPItem interface {
+	EncodeRLP() []byte
+}
+
 // A string (ie. byte array) is an item
-type RLPItem struct {
+type RLPString struct {
 	value []byte
 }
 
-func NewRLPItem(value []byte) *RLPItem {
-	return &RLPItem{value: value}
+func NewRLPString(value []byte) *RLPString {
+	return &RLPString{value: value}
 }
 
-func NewRLPItemFromStr(str string) *RLPItem {
-	return NewRLPItem([]byte(str))
+func NewRLPStringFromStr(str string) *RLPString {
+	return NewRLPString([]byte(str))
 }
 
-func NewRLPItemFromUint(uintVal uint64) *RLPItem {
+func NewRLPStringFromUint(uintVal uint64) *RLPString {
 	valBytes := uintToBytes(uintVal)
 
-	return NewRLPItem(trimLeftZerosFromBytes(valBytes))
+	return NewRLPString(trimLeftZerosFromBytes(valBytes))
 }
 
-func (r *RLPItem) GetBytes() []byte {
-	return r.value
+func (s *RLPString) EncodeRLP() []byte {
+	encodeBytes := encodeString(s.value)
+	return encodeBytes
 }
 
-func (r *RLPItem) ToString() string {
-	return fmt.Sprintf("%s", r.value)
+func (s *RLPString) GetBytes() []byte {
+	return s.value
 }
 
-func (r *RLPItem) ToUint() uint64 {
+func (s *RLPString) ToString() string {
+	return fmt.Sprintf("%s", s.value)
+}
+
+func (s *RLPString) ToUint() uint64 {
 	b := make([]byte, 8)
-	copy(b[8-len(r.value):], r.value)
+	copy(b[8-len(s.value):], s.value)
 	return binary.BigEndian.Uint64(b)
+}
+
+// A list of items is an item
+type RLPList struct {
+	items []RLPItem
+}
+
+func NewRLPList(items ...RLPItem) *RLPList {
+	return &RLPList{items:items}
+}
+
+func (l *RLPList) EncodeRLP() []byte {
+	encodeBytes := encodeList(l.items)
+	return encodeBytes
+}
+
+func (l *RLPList) AddItem(items ...RLPItem)  {
+	l.items = append(l.items, items...)
 }
