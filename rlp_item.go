@@ -44,10 +44,16 @@ func (s *RlpString) GetBytes() []byte {
 }
 
 func (s *RlpString) ToString() string {
+	if len(s.value) == 0 {
+		return ""
+	}
 	return fmt.Sprintf("%s", s.value)
 }
 
 func (s *RlpString) ToUint() uint64 {
+	if len(s.value) == 0 {
+		return 0
+	}
 	b := make([]byte, 8)
 	copy(b[8-len(s.value):], s.value)
 	return binary.BigEndian.Uint64(b)
