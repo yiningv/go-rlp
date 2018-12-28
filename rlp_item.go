@@ -29,8 +29,14 @@ func NewRLPStringFromUint(uintVal uint64) *RLPString {
 }
 
 func (s *RLPString) EncodeRLP() []byte {
-	encodeBytes := encodeString(s.value)
-	return encodeBytes
+	b := s.value
+	if len(b) == 0 {
+		return []byte{0x80}
+	}
+	if len(b) == 1 && b[0] < 0x7F {
+		return b
+	}
+	return encode(b, OFFSET_SHORT_STRING)
 }
 
 func (s *RLPString) GetBytes() []byte {
@@ -57,8 +63,14 @@ func NewRLPList(items ...RLPItem) *RLPList {
 }
 
 func (l *RLPList) EncodeRLP() []byte {
-	encodeBytes := encodeList(l.items)
-	return encodeBytes
+	if len(l.items) == 0 {
+		return []byte{0xC0}
+	}
+	var b []byte
+	for _, item := range l.items {
+		b = append(b, item.EncodeRLP()...)
+	}
+	return encode(b, OFFSET_SHORT_LIST)
 }
 
 func (l *RLPList) AddItem(items ...RLPItem)  {

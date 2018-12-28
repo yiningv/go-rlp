@@ -2,16 +2,12 @@ package rlp
 
 import (
 	"encoding/binary"
-	"reflect"
-	"strings"
 )
 
-// for string: 0xb7-0x80=0x37
-// for list:   0xf7-0xc0=0x37
-func encodeString(b []byte, offset byte) []byte {
-	if len(b) == 1 && b[0] < 0x7F {
-		return b
-	} else if len(b) <= 55 {
+// for string: 0xb7-0x80=0x37 55
+// for list:   0xf7-0xc0=0x37 55
+func encode(b []byte, offset byte) []byte {
+	if len(b) <= 55 {
 		result := make([]byte, len(b)+1)
 		result[0] = offset + byte(len(b))
 		copy(result[1:], b)
@@ -25,22 +21,6 @@ func encodeString(b []byte, offset byte) []byte {
 		copy(result[lenBytesLen+1:], b)
 		return result
 	}
-}
-
-func encodeList(items []RLPItem) []byte {
-	if len(items) == 0 {
-		return []byte{0xC0}
-	}
-	var result []byte
-	for _, item := range items {
-		typeOf := reflect.TypeOf(item).String()
-		if strings.Contains(typeOf, "RLPString") {
-			result = append(result, encodeString(item.EncodeRLP())...)
-		} else {
-			encodeList()
-		}
-	}
-	return result
 }
 
 // 转换uint为字节数组
